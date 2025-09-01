@@ -1,0 +1,39 @@
+﻿@inject IHttpContextAccessor Http
+@inject IJSRuntime JSRuntime
+
+@rendermode InteractiveServer
+
+@if (showBanner)
+{
+    <div class="privacy-policy-info">
+        <span class="cookie-icon">🍪</span>
+        Korzystając ze strony wyrażasz zgodę na wykorzystanie przez serwis plików cookies.
+        <a href="/Privacy">Dowiedz się więcej</a>
+        <button @onclick="AcceptMessage" type="button" class="btn btn-light btn-sm mx-3 my-1 privacy-policy-btn">Ok, rozumiem</button>
+    </div>
+}
+<script>
+    window.CookieFunction = {
+        acceptMessage: function (cookieString) {
+            document.cookie = cookieString;
+        }
+    };
+</script>
+@code {
+    ITrackingConsentFeature consentFeature;
+    bool showBanner;
+    string cookieString;
+
+    protected override void OnInitialized()
+    {
+        consentFeature = Http.HttpContext.Features.Get<ITrackingConsentFeature>();
+        showBanner = !consentFeature?.CanTrack ?? false;
+        cookieString = consentFeature?.CreateConsentCookie();
+    }
+
+    private async Task AcceptMessage()
+    {
+        await JSRuntime.InvokeVoidAsync("CookieFunction.acceptMessage", cookieString);
+        showBanner = false;
+    }
+}

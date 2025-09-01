@@ -1,0 +1,267 @@
+﻿@page "/settings"
+@rendermode InteractiveServer
+
+@inject JsonSettingsStore JsonSettingsStore
+@inject ILogger<Settings> Logger
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IHttpContextAccessor HttpContextAccessor
+
+@attribute [Authorize]
+
+<h1>Ustawienia odpowiedzi</h1>
+
+@if (_settings != null)
+{
+    <p>
+        <i style="font-size: 16px;">
+            Najedź myszką na ikonę informacyjną aby wyświetlić wyjaśnienie.
+        </i>
+    </p>
+    <EditForm Model="_settings" OnValidSubmit="OnValidSubmit" FormName="_settings">
+        <div class="form-group mb-1">
+            <label>Styl długości odpowiedzi:</label>
+            <InputSelect @bind-Value="_settings.MessageLength" @bind-Value:after="ClearStatus">
+                <option value="minimalist">Minimalistyczny</option>
+                <option value="concise">Krótki</option>
+                <option value="normal">Średni</option>
+                <option value="wordy">Długi</option>
+            </InputSelect>
+        </div>
+
+        <div class="form-group mb-1">
+            <label>Ton odpowiedzi:</label>
+            <InputSelect @bind-Value="_settings.Tone" @bind-Value:after="ClearStatus">
+                <option value="neutral">Neutralny</option>
+                <option value="friendly">Przyjazny</option>
+                <option value="formal">Formalny</option>
+                <option value="humorous">Humorystyczny</option>
+            </InputSelect>
+        </div>
+
+        <div class="form-group mb-1">
+            <label>Domyślny język programowania:</label>
+            <InputSelect @bind-Value="_settings.DefaultProgrammingLanguage" @bind-Value:after="ClearStatus">
+                <option value="">--Wybierz język--</option>
+                <option value="C#">C#</option>
+                <option value="C">C</option>
+                <option value="C++">C++</option>
+                <option value="JavaScript">JavaScript</option>
+                <option value="Python">Python</option>
+                <option value="PHP">PHP</option>
+            </InputSelect>
+        </div>
+
+        <div class="form-group mb-1">
+            <label>Domyślny framework:</label>
+            <InputSelect @bind-Value="_settings.DefaultFramework" @bind-Value:after="ClearStatus">
+                <option value="">--Wybierz framework--</option>
+                <option value="AspNetCore">ASP .NET Core / ASP .NET</option>
+                <option value="Blazor">Blazor</option>
+                <option value="AspNetFramework">ASP .NET Framework</option>
+                <option value="WPF">WPF</option>
+                <option value="Winforms">Windows Forms</option>
+                <option value="NetMaui">.Net MAUI</option>
+                <option value="Xamarin">Xamarin</option>
+                <option value="Unity">Unity</option>
+                <option value="React">React</option>
+                <option value="Angular">Angular</option>
+                <option value="Vue">Vue</option>
+                <option value="Django">Django</option>
+                <option value="Qt">Qt</option>
+                <option value="Wt">Wt</option>
+            </InputSelect>
+        </div>
+
+        <div class="form-group mb-1">
+            <label>Kreatywność (temperature):</label>
+            <span title="Wybierz dowolną wartość typu float od 0 do 1. 0 = deterministyczny, 1 = kreatywny.">ℹ️</span>
+            <InputNumber @bind-Value="_settings.Creativity" step="0.1" @oninput="ClearStatus" />
+        </div>
+
+        <div class="form-group mb-1">
+            <label>Maksymalna liczba tokenów:</label>
+            <span title="Token to słowo, znak interpunkcyjny lub symbol. Jeśli zostanie ustawiona zbyt mała liczba tokenów, odpowiedź może być ucięta.">ℹ️</span>
+            <InputNumber @bind-Value="_settings.MaxTokens" @oninput="ClearStatus" />
+        </div>
+
+        <div class="form-group mb-1">
+            <label>Podpowiadaj prompty</label>
+            <span title="Wyświetlaj listę rozwijaną z sugerowanymi promptami.">ℹ️</span>
+            <InputCheckbox @bind-Value="_settings.SuggestPrompts" @bind-Value:after="ClearStatus" class="switch" />
+        </div>
+
+        <div class="form-group mb-1">
+            <label>Odpowiadaj po polsku</label>
+            <span title="Jeśli ta opcja będzie wyłączona, język zostanie wybrany automatycznie.">ℹ️</span>
+            <InputCheckbox @bind-Value="_settings.UsePolishAsDefaultLanguage" @bind-Value:after="ClearStatus" class="switch" />
+        </div>
+
+        <div class="form-group mb-1">
+            <label>Podaj źródło skrótów</label>
+            <span title="Np. h jak heading w HTML.">ℹ️</span>
+            <InputCheckbox @bind-Value="_settings.IncludeShortcutSources" @bind-Value:after="ClearStatus" class="switch" />
+        </div>
+
+        <div class="form-group mb-1">
+            <label>Używaj skróconej składni C#</label>
+            <span title="Np. używaj primary constructor, uproszczonej składni new, body expressions, embedded statements.">ℹ️</span>
+            <InputCheckbox @bind-Value="_settings.UseShortCSharpSyntax" @bind-Value:after="ClearStatus" class="switch" />
+        </div>
+
+        <div class="form-group mb-1">
+            <label>Unikaj var</label>
+            <span title="Przez var można utracić kontrolę nad typem danych, np. programista pisząc var x = 5 będzie miał na myśli byte x = 5, a kompilator domniema, że chodzi o int.">ℹ️</span>
+            <InputCheckbox @bind-Value="_settings.AvoidVar" @bind-Value:after="ClearStatus" class="switch" />
+        </div>
+
+        <div class="form-group mb-1">
+            <label>Używaj technicznych nazw plików</label>
+            <span title="np. resmon.exe zamiast monitor zasobów">ℹ️</span>
+            <InputCheckbox @bind-Value="_settings.UseTechnicalFileNames" @bind-Value:after="ClearStatus" class="switch" />
+        </div>
+
+        <div class="form-group mb-1">
+            <label>Sprawdzaj poprawność tekstu w języku obcym</label>
+            <span title="Jeśli napiszę coś w języku obcym, sprawdź poprawność. Chcę dobrze nauczyć się języka obcego, więc wolę wiedzieć że coś napisałem źle, niż żyć w niewiedzy.">ℹ️</span>
+            <InputCheckbox @bind-Value="_settings.CheckForeignLanguageAccuracy" @bind-Value:after="ClearStatus" class="switch" />
+        </div>
+
+        <div class="form-group mb-1">
+            <label>Podawaj wszystkie polskie tłumaczenia</label>
+            <span title="Tłumacząc słówko lub idiom na polski, podaj wszystkie tłumaczenia. Dzięki temu można uniknąć nieporozumień.">ℹ️</span>
+            <InputCheckbox @bind-Value="_settings.ProvideAllPolishTranslations" @bind-Value:after="ClearStatus" class="switch" />
+        </div>
+
+        <div class="form-group mb-1">
+            <label>Tłumaczenia z poprawną częścią mowy</label>
+            <span title="Np. przetłumacz make jako robić a nie robienie.">ℹ️</span>
+            <InputCheckbox @bind-Value="_settings.ForeignTranslationWithProperPartOfSpeech" @bind-Value:after="ClearStatus" class="switch" />
+        </div>
+
+        <div class="form-group mb-1">
+            <label>Dołączaj podstawy prawne</label>
+            <span title="Do każdej porady prawnej dodaj podstawę prawną.">ℹ️</span>
+            <InputCheckbox @bind-Value="_settings.IncludeLegalReferences" @bind-Value:after="ClearStatus" class="switch" />
+        </div>
+
+        <div class="form-group mb-1">
+            <label>Instrukcje dla angielskiego UI</label>
+            <span title="Korzystam z oprogramowania w języku angielskim. Uwzględnij to w swoich radach.">ℹ️</span>
+            <InputCheckbox @bind-Value="_settings.InstructionsInEnglishUI" @bind-Value:after="ClearStatus" class="switch" />
+        </div>
+
+        <div class="form-group mb-1">
+            <label>Używaj [0-9] zamiast \d w regex</label>
+            <span title="\d obejmuje również cyfry z innych alfabetów.">ℹ️</span>
+            <InputCheckbox @bind-Value="_settings.UseNumericRegex" @bind-Value:after="ClearStatus" class="switch" />
+        </div>
+
+        <div class="form-group mb-1">
+            <label>Odpowiadaj tylko jeśli jesteś pewien</label>
+            <span title="Jeśli nie znasz odpowiedzi, to jej nie wymyślaj, tylko napisz że nie wiesz. To jest denerwujące, że np. po zapytaniu o poradę prawną AI wymyśla przepis, który nie istnieje.">ℹ️</span>
+            <InputCheckbox @bind-Value="_settings.AnswerOnlyIfCertain" @bind-Value:after="ClearStatus" class="switch" />
+        </div>
+
+        <div class="form-group mb-1">
+            <label>Używaj bogatego zasobu słów</label>
+            <InputCheckbox @bind-Value="_settings.UseRichVocabulary" @bind-Value:after="ClearStatus" class="switch" />
+        </div>
+
+        <div class="form-group mb-1">
+            <label>Podawaj skojarzenia słów</label>
+            <span title="Np. vehicle można skojarzyć z wehikułem, dzięki czemu łatwiej zapamiętać słówko.">ℹ️</span>
+            <InputCheckbox @bind-Value="_settings.ProvideWordAssociations" @bind-Value:after="ClearStatus" class="switch" />
+        </div>
+
+        <div class="form-group mb-1">
+            <label>Nie podawaj od razu rozwiązań zagadek</label>
+            <span title="Jeśli podajesz zadanie lub zagadkę do rozwiązania, to pozwól mi pomyśleć - nie podawaj odpowiedzi razem z pytaniem.">ℹ️</span>
+            <InputCheckbox @bind-Value="_settings.NoImmediatePuzzleSolutions" @bind-Value:after="ClearStatus" class="switch" />
+        </div>
+
+        <div class="form-group mb-1">
+            <label>Używaj zmiennych środowiskowych do ścieżek</label>
+            <span title="Np. pisz %tmp% zamiast C:\Users\Admin\AppData\Local\Temp.">ℹ️</span>
+            <InputCheckbox @bind-Value="_settings.UseEnvironmentVariablesForPaths" @bind-Value:after="ClearStatus" class="switch" />
+        </div>
+
+        <div class="form-group mb-1">
+            <label>Podawaj tylko zmiany w kodzie</label>
+            <span title="Jeśli zmieniasz coś w moim kodzie, to nie wklejaj całego kodu, tylko to, co zmieniłeś.">ℹ️</span>
+            <InputCheckbox @bind-Value="_settings.WriteOnlyChanges" @bind-Value:after="ClearStatus" class="switch" />
+        </div>
+
+        <div class="form-group">
+            <label>Dodatkowe ustawienia ChatBota:</label>
+            <textarea id="extra" rows="3" class="form-control" @bind="_settings.CustomProperties" @oninput="ClearStatus"></textarea>
+        </div>
+
+        <div class="form-group mt-3 mb-1">
+            @if (!string.IsNullOrEmpty(_statusMessage))
+            {
+                <p class="@_statusClass">@_statusMessage</p>
+            }
+            <button type="submit" class="btn btn-primary">Zapisz ustawienia</button>
+        </div>
+    </EditForm>
+}
+
+@code {
+    ChatBot.Models.Settings? _settings;
+    string _userId;
+    private string? _statusMessage;
+    private string? _statusClass;
+    string[] tones = new[] { "neutral", "humorous" };
+
+    private async Task OnValidSubmit()
+    {
+        if (_settings == null || string.IsNullOrEmpty(_userId))
+        {
+            _statusMessage = "Błąd: Ustawienia lub identyfikator użytkownika są puste.";
+            _statusClass = "text-danger";
+            Logger.LogError("Ustawienia lub identyfikator użytkownika są puste. Settings: {_settings}, UserId: {_userId}", _settings, _userId);
+            return;
+        }
+
+        try
+        {
+            JsonSettingsStore.Serialize(_settings, _userId);
+            _statusMessage = "Zapisano ustawienia.";
+            _statusClass = "text-success";
+        }
+        catch (Exception ex)
+        {
+            _statusMessage = "Błąd podczas zapisywania ustawień.";
+            _statusClass = "text-danger";
+            Logger.LogError(ex, "Błąd podczas zapisywania ustawień dla użytkownika {_userId}. Treść błędu: " + ex.Message, _userId);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await LoadSettingsAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Błąd podczas ładowania ustawień dla użytkownika {_userId}. Treść błędu: " + ex.Message, _userId);
+            _statusMessage = "Błąd podczas ładowania ustawień.";
+            _statusClass = "text-danger";
+        }
+    }
+
+    private async Task LoadSettingsAsync()
+    {
+        _userId = HttpContextAccessor.HttpContext?.User?.Identity?.Name
+                  ?? throw new InvalidOperationException("User is not authenticated.");
+
+        _settings = await Task.Run(() => JsonSettingsStore.Deserialize(_userId));
+    }
+
+    private void ClearStatus()
+    {
+        _statusMessage = null;
+        _statusClass = null;
+    }
+}

@@ -1,0 +1,19 @@
+﻿@page "/Account/Logout"
+@inject SignInManager<ApplicationUser> SignInManager
+@inject NavigationManager NavigationManager
+
+<form method="post" @formname="logout" @onsubmit="HandleLogout">
+</form>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await HandleLogout();
+    }
+
+    private async Task HandleLogout()
+    {
+        await SignInManager.SignOutAsync();
+        NavigationManager.NavigateTo("/", forceLoad: true);
+    }
+}

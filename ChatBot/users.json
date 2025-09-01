@@ -1,0 +1,36 @@
+[
+  {
+    "Id": "9b3341d5-fd0d-4ed4-aef6-fc3e0cdbc88c",
+    "UserName": "marko1024@seznam.cz",
+    "NormalizedUserName": "MARKO1024@SEZNAM.CZ",
+    "Email": "marko1024@seznam.cz",
+    "NormalizedEmail": "MARKO1024@SEZNAM.CZ",
+    "EmailConfirmed": false,
+    "PasswordHash": "AQAAAAIAAYagAAAAEPnAB4jeLhL63QqtlZBC1HAaiLmdtLj4jMHv\u002BUf55z6T4kGzWqC8qc60Y8\u002BV0tSSlQ==",
+    "SecurityStamp": "3919b572-2314-42db-950a-69cf5875a4b0",
+    "ConcurrencyStamp": "277f6631-3ca0-45c9-99d0-0adbf9f9603b",
+    "PhoneNumber": null,
+    "PhoneNumberConfirmed": false,
+    "TwoFactorEnabled": false,
+    "LockoutEnd": null,
+    "LockoutEnabled": false,
+    "AccessFailedCount": 0
+  },
+  {
+    "Id": "0d7a543c-cd74-450d-b59e-9b1e5c049e1b",
+    "UserName": "marko453@interia.pl",
+    "NormalizedUserName": "MARKO453@INTERIA.PL",
+    "Email": "marko453@interia.pl",
+    "NormalizedEmail": "MARKO453@INTERIA.PL",
+    "EmailConfirmed": false,
+    "PasswordHash": "AQAAAAIAAYagAAAAECEXHjrBUPeMIVH5oqBb0Y1ZhM\u002BAqQw52QtI5IfYROhVAM5AxxZvcnPi9RE0YbwNOQ==",
+    "SecurityStamp": "f28d245b-4cac-43c5-b6df-32f2f526f0d2",
+    "ConcurrencyStamp": "83a6c258-6bb5-4619-93db-3ede4a0a4e77",
+    "PhoneNumber": null,
+    "PhoneNumberConfirmed": false,
+    "TwoFactorEnabled": false,
+    "LockoutEnd": null,
+    "LockoutEnabled": false,
+    "AccessFailedCount": 0
+  }
+]

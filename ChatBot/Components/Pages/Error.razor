@@ -1,0 +1,37 @@
+﻿@page "/Error/{StatusCode:int?}"
+@inject ILogger<Settings> Logger
+
+<PageTitle>Error</PageTitle>
+
+<h1 class="text-danger">Wystąpił błąd @(StatusCode.HasValue?$"{StatusCode.Value}" : "404").</h1>
+@if (StatusCode is null)
+{
+    <h2 class="text-danger">Nie znaleziono strony.</h2>
+}
+<h5>
+    Jeśli problem będzie się powtarzał,
+    <a href="mailto:admin@email.xyz">skontaktuj się z administratorem</a>.
+</h5>
+
+@if (ShowRequestId)
+{
+    <p>
+        <strong>Id zapytania:</strong> <code>@RequestId</code>
+    </p>
+}
+
+@code{
+    [CascadingParameter]
+    private HttpContext? HttpContext { get; set; }
+
+    private string? RequestId { get; set; }
+    private bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+    [Parameter]
+    public int? StatusCode { get; set; }
+
+    protected override void OnInitialized() 
+    {
+        RequestId = Activity.Current?.Id ?? HttpContext?.TraceIdentifier;
+        Logger.LogError("Wystąpił błąd " + StatusCode.HasValue + ". Request Id = " + RequestId);
+    }
+}
