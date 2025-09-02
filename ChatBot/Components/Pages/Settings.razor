@@ -1,6 +1,5 @@
 ﻿@page "/settings"
 @rendermode InteractiveServer
-
 @inject JsonSettingsStore JsonSettingsStore
 @inject ILogger<Settings> Logger
 @inject AuthenticationStateProvider AuthStateProvider
@@ -18,6 +17,8 @@
         </i>
     </p>
     <EditForm Model="_settings" OnValidSubmit="OnValidSubmit" FormName="_settings">
+        <FluentValidationValidator />
+
         <div class="form-group mb-1">
             <label>Styl długości odpowiedzi:</label>
             <InputSelect @bind-Value="_settings.MessageLength" @bind-Value:after="ClearStatus">
@@ -75,13 +76,15 @@
         <div class="form-group mb-1">
             <label>Kreatywność (temperature):</label>
             <span title="Wybierz dowolną wartość typu float od 0 do 1. 0 = deterministyczny, 1 = kreatywny.">ℹ️</span>
-            <InputNumber @bind-Value="_settings.Creativity" step="0.1" @oninput="ClearStatus" />
+              <input type="number" inputmode="decimal" step="0.1" @bind="_settings.Creativity" @oninput="ClearStatus" />
+               <ValidationMessage For="@(() => _settings.Creativity)" />
         </div>
 
         <div class="form-group mb-1">
             <label>Maksymalna liczba tokenów:</label>
             <span title="Token to słowo, znak interpunkcyjny lub symbol. Jeśli zostanie ustawiona zbyt mała liczba tokenów, odpowiedź może być ucięta.">ℹ️</span>
-            <InputNumber @bind-Value="_settings.MaxTokens" @oninput="ClearStatus" />
+            <input type="number" inputmode="numeric" step="1" @bind="_settings.MaxTokens" @oninput="ClearStatus" />
+            <ValidationMessage For="@(() => _settings.MaxTokens)" />
         </div>
 
         <div class="form-group mb-1">
