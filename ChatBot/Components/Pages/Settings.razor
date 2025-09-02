@@ -16,7 +16,7 @@
             Najedź myszką na ikonę informacyjną aby wyświetlić wyjaśnienie.
         </i>
     </p>
-    <EditForm Model="_settings" OnValidSubmit="OnValidSubmit" FormName="_settings">
+    <EditForm Model="_settings" OnValidSubmit="OnValidSubmit" OnInvalidSubmit="OnInvalidSubmit" FormName="_settings">
         <FluentValidationValidator />
 
         <div class="form-group mb-1">
@@ -216,7 +216,7 @@
     private string? _statusClass;
     string[] tones = new[] { "neutral", "humorous" };
 
-    private async Task OnValidSubmit()
+    private void OnValidSubmit()
     {
         if (_settings == null || string.IsNullOrEmpty(_userId))
         {
@@ -238,6 +238,12 @@
             _statusClass = "text-danger";
             Logger.LogError(ex, "Błąd podczas zapisywania ustawień dla użytkownika {_userId}. Treść błędu: " + ex.Message, _userId);
         }
+    }
+
+    private void OnInvalidSubmit()
+    {
+         _statusMessage = "Nie zapisano ustawień. Wystąpiły błędy walidacji.";
+         _statusClass = "text-danger";
     }
 
     protected override async Task OnInitializedAsync()
